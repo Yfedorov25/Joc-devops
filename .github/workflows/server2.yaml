@@ -8,8 +8,8 @@ jobs:
   deploy:
     environment: testingvariables
     env:
-      SSH_HOST: ${{ var.SSH_HOST }}
-      SSH_USER: ${{ var.REMOTE_USER }}
+      SSH_HOST: ${{ env.SSH_HOST }}
+      SSH_USER: ${{ env.REMOTE_USER }}
       SSH_KEY: ${{ secrets.SSH_KEY }}
     runs-on: ubuntu-latest
     steps:
@@ -17,8 +17,8 @@ jobs:
         uses: actions/checkout@v3
       - name: Output variables
         run: |
-          echo "SSH_HOST: ${{ var.SSH_HOST }}"
-          echo "SSH_USER: ${{ var.REMOTE_USER }}"
+          echo "SSH_HOST: ${{ env.SSH_HOST }}"
+          echo "SSH_USER: ${{ env.REMOTE_USER }}"
           echo "SSH_KEY: ${{ secrets.SSH_KEY }}"
       - name: Configure SSH
         run: |
