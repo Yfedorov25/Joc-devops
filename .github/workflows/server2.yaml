@@ -1,8 +1,8 @@
-name: 
+name:
 on:
   push:
     branches:
-    - master
+      - master
 
 jobs:
   deploy:
@@ -11,15 +11,31 @@ jobs:
       SSH_HOST: ${{ vars.SSH_HOST }}
       SSH_USER: ${{ vars.REMOTE_USER }}
       SSH_KEY: ${{ secrets.SSH_KEY }}
+
     runs-on: ubuntu-latest
     steps:
       - name: Get Code
         uses: actions/checkout@v3
-      - name: Output variables
+
+      - name: Build, tag, and push docker image to Amazon ECR
+        id: build-image
+        # env:
+        #   REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        #   REPOSITORY: joc-user-dev
+        #   IMAGE_TAG: ${{github.run_number}}
+        #   CONTEXT: joc-user-ms
         run: |
-          echo "SSH_HOST: ${{ vars.SSH_HOST }}"
-          echo "SSH_USER: ${{ vars.REMOTE_USER }}"
-          echo "SSH_KEY: ${{ secrets.SSH_KEY }}"
+          # chmod +x bin/npm-registry.sh
+          # bin/npm-registry.sh
+          # ls -la
+          # mv .npmrc $CONTEXT/.npmrc
+
+          # docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG $CONTEXT
+          # docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+          #echo "::set-output name=image::$REGISTRY/$REPOSITORY:$IMAGE_TAG"
+
+          echo "::set-output name=image::httpd:latest"
+
       - name: Configure SSH
         run: |
           mkdir -p ~/.ssh/
@@ -33,7 +49,12 @@ jobs:
             StrictHostKeyChecking no
           END
 
-      - name: List home directory
+      - name: Deploy to EC2
+        env:
+          SERVICE_NAME: httpd
+          IMAGE: ${{ steps.build-image.outputs.image }}
         run: |
           cat ~/.ssh/config
-          ssh ec2 'ls -la'
+
+          tmp=".services.$SERVICE_NAME.image=env(IMAGE)"
+          ssh ec2 'yq e -i "$tmp" docker-compose.yml && docker-compose up -d'
