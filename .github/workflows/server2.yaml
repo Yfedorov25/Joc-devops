@@ -51,12 +51,12 @@ jobs:
 
       - name: Deploy to EC2
         env:
-          SERVICE_NAME: httpd
+          SERVICE_NAME: nginx
           IMAGE: ${{ steps.build-image.outputs.image }}
         run: |
           cat ~/.ssh/config
 
           tmp=".services.$SERVICE_NAME.image=env(IMAGE)"
-          ssh ec2 'cat /home/ec2-user/docker-compose.yml && yq e -i "$tmp" /home/ec2-user/docker-compose.yml && cat /home/ec2-user/docker-compose.yml && docker-compose up -d'
+          ssh ec2 'yq e -i "$tmp" docker-compose.yml && docker-compose up -d'
 
 
