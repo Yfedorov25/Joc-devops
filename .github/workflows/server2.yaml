@@ -60,7 +60,8 @@ jobs:
           echo $tmp
 
           ssh ec2 '
-            yq e -i "$tmp" docker-compose.yml
+            set -ex
+            yq e -i "$tmp" /home/ec2-user/docker-compose.yml
             cat docker-compose.yml
             docker-compose up -d
           '
