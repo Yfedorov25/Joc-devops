@@ -54,16 +54,10 @@ jobs:
           SERVICE_NAME: nginx
           IMAGE: ${{ steps.build-image.outputs.image }}
         run: |
-          cat ~/.ssh/config
-
-          tmp=$(echo ".services.$SERVICE_NAME.image=$IMAGE")
-          echo $tmp
-
-          ssh ec2 '
-            set -ex
-            yq e -i "$tmp" /home/ec2-user/docker-compose.yml
-            cat docker-compose.yml
-            docker-compose up -d
-          '
-
-
+          ssh ec2 bash -s <<EOF
+          export SERVICE_NAME=$SERVICE_NAME
+          export IMAGE=$IMAGE
+          yq e -i ".services.$SERVICE_NAME.image=env(IMAGE)" docker-compose.yml
+          cat docker-compose.yml
+          docker-compose up -d
+          EOF
