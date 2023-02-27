@@ -57,4 +57,4 @@ jobs:
           cat ~/.ssh/config
 
           tmp=".services.$SERVICE_NAME.image=env(IMAGE)"
-          ssh ec2 'yq e -i "$tmp" docker-compose.yml && docker-compose up -d'
+          ssh ec2 'ls -l && yq e -i "$tmp" /home/ec2-user/docker-compose.yml && docker-compose up -d'
