@@ -56,13 +56,10 @@ jobs:
         run: |
           cat ~/.ssh/config
 
-          
-
-          echo $IMAGE
+          tmp=$(echo ".services.$SERVICE_NAME.image=$IMAGE")
           echo $tmp
+
           ssh ec2 '
-            export IMAGE=$IMAGE
-            tmp=".services.$SERVICE_NAME.image=env(IMAGE)"
             yq e -i "$tmp" docker-compose.yml
             cat docker-compose.yml
             docker-compose up -d
